@@ -3,8 +3,8 @@ import mediapipe as mp
 import numpy as np
 from tqdm import tqdm
 
-VIDEO_PATH = "data/sample1.mp4"
-OUTPUT_PATH = "data/pose_seq1.npy"
+VIDEO_PATH = "data/sample7.mp4"
+OUTPUT_PATH = "data/pose_seq7.npy"
 
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose(static_image_mode=False)
