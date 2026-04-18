@@ -6,7 +6,7 @@ from torch.utils.data import Dataset, DataLoader, random_split
 
 
 SEQ_LEN = 10
-DATA_DIR = "data"
+DATA_DIR = "videos"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -21,11 +21,12 @@ class PoseDataset(Dataset):
             pose = np.load(file)
 
             pose = self.clean_sequence(pose)
+            PRED_LEN =15
 
-            for i in range(len(pose) - SEQ_LEN):
+            for i in range(len(pose) - SEQ_LEN - PRED_LEN):
 
                 x = pose[i:i+SEQ_LEN]
-                y = pose[i+SEQ_LEN]
+                y = pose[i+SEQ_LEN:i+SEQ_LEN+ PRED_LEN]
 
                 self.samples.append((x, y))
 
@@ -71,7 +72,7 @@ class PosePredictor(nn.Module):
             batch_first=True
         )
 
-        self.fc = nn.Linear(128, 66)
+        self.fc = nn.Linear(128, 66 * 15）
 
 
     def forward(self, x):
@@ -82,7 +83,7 @@ class PosePredictor(nn.Module):
 
         out = self.fc(h[-1])
 
-        return out.view(-1, 33, 2)
+        return out.view(-1, 15, 33, 2)
 
 
 files = [
@@ -95,13 +96,14 @@ files = [
 dataset = PoseDataset(files)
 
 
-train_size = int(0.8 * len(dataset))
-val_size = len(dataset) - train_size
+train_size = int(0.7 * len(dataset))
+val_size = int(0.15 * len(dataset)) 
+test_size = len(dataset) - train_size - val_size
 
 
-train_dataset, val_dataset = random_split(
+train_dataset, val_dataset, test_dataset = random_split(
     dataset,
-    [train_size, val_size]
+    [train_size, val_size, test_size]
 )
 
 
@@ -115,6 +117,11 @@ train_loader = DataLoader(
 val_loader = DataLoader(
     val_dataset,
     batch_size=32
+)
+
+test_loader = DataLoader(
+    test_dataset,
+    batch_size = 32
 )
 
 
@@ -161,6 +168,7 @@ for epoch in range(20):
     model.eval()
 
     val_loss = 0
+    test_loss = 0
 
 
     with torch.no_grad():
@@ -180,3 +188,13 @@ for epoch in range(20):
     print(
         f"Epoch {epoch} | Train Loss {train_loss:.4f} | Val Loss {val_loss:.4f}"
     )
+
+    with torch.no_grad():
+        for x, y in test_loader:
+            x = x.to(DEVICE)
+            y = y.to(DEVICE)
+
+            pred = model(x)
+            loss = loss_fn(pred, y)
+            test_loss += loss.item()
+    print(f"Final Test Loss: {test_loss:.4f}")

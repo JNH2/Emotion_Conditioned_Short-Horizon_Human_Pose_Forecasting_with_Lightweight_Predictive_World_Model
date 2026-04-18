@@ -4,8 +4,8 @@ import numpy as np
 from tqdm import tqdm
 import os
 
-VIDEO_PATH = "data/sample7.mp4"
-OUTPUT_PATH = "data/emotion_seq7.npy"
+VIDEO_PATH = "videos/youtube5.mov"
+OUTPUT_PATH = "videos/emotion_youtube5.npy"
 
 mp_face = mp.solutions.face_mesh
 face_mesh = mp_face.FaceMesh(static_image_mode=False)

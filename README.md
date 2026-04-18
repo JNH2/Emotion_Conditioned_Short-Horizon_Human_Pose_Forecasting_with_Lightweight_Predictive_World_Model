@@ -66,4 +66,9 @@ curl -L -o sample3.mp4 https://github.com/intel-iot-devkit/sample-videos/raw/mas
 curl -L -o sample4.mp4 https://github.com/intel-iot-devkit/sample-videos/raw/master/head-pose-face-detection-female.mp4
 
 
-
+Videos Shape:
+youtube1: (567, 33, 2) (567, 20)
+youtube2: (95, 33, 2) (95, 20)
+youtube3: (345, 33, 2) (345, 20)
+youtube4: (851, 33, 2) (851, 20)
+youtube5: (710, 33, 2) (710, 20)
