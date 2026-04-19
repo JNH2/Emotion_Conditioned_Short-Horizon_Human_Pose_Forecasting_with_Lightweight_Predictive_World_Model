@@ -1,14 +1,18 @@
 import torch
 
-from train_fusion_predictor import FusionPredictor
-from train_fusion_predictor import test_loader
+#from train_fusion_predictor import FusionPredictor
+#from train_fusion_predictor import test_loader
+from train_pose_baseline import PosePredictor, test_loader
+from train_pose_baseline import PoseDataset
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-model = FusionPredictor().to(DEVICE)
+#model = FusionPredictor().to(DEVICE)
 
-model.load_state_dict(torch.load("fusion_model.pt"))
+#model.load_state_dict(torch.load("fusion_model.pt"))
 
+model = PosePredictor().to(DEVICE)
+model.load_state_dict(torch.load("pose_baseline_model.pt"))
 
 def mpjpe(pred, target):
 
@@ -25,7 +29,6 @@ def evaluate(model, loader, device):
     total_samples = 0
 
     with torch.no_grad():
-
         for x, y in loader:
 
             x = x.to(device)

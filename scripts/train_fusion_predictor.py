@@ -238,3 +238,4 @@ plt.xlabel("Epoch")
 plt.ylabel("Loss")
 
 plt.savefig("loss_curve.png")
+torch.save(model.state_dict(), "fusion_model.pt")
