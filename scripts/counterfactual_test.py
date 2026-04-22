@@ -1,14 +1,12 @@
 import torch
 import numpy as np
 import os
-from train_fusion_predictor import FusionPredictor
+#from train_fusion_predictor import FusionPredictor
 from train_fusion_predictor import FusionDataset
+from train_world_model_rollout import WorldModelPredictor
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
 def counterfactual_test(model, sample):
-
     x, _ = sample
 
     x = x.unsqueeze(0).to(DEVICE)
@@ -40,7 +38,7 @@ emotion_files = sorted([
 ])
 
 dataset = FusionDataset(pose_files, emotion_files)
-model = FusionPredictor().to(DEVICE)
-model.load_state_dict(torch.load("fusion_model.pt"))
-
+model = WorldModelPredictor().to(DEVICE)
+#model.load_state_dict(torch.load("fusion_model.pt"))
+model.load_state_dict(torch.load("world_model_fusion.pt"))
 counterfactual_test(model, dataset[10])

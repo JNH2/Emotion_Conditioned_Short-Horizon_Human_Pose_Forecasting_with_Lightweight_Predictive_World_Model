@@ -3,8 +3,8 @@ import mediapipe as mp
 import numpy as np
 from tqdm import tqdm
 
-VIDEO_PATH = "videos/youtube5.mov"
-OUTPUT_PATH = "videos/pose_youtube5.npy"
+VIDEO_PATH = "sample_anger.mp4"
+OUTPUT_PATH = "sample.npy"
 
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose(static_image_mode=False)

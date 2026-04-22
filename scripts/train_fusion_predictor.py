@@ -11,31 +11,40 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class FusionDataset(Dataset):
-
     def __init__(self, pose_files, emotion_files):
 
         self.samples = []
-
+        all_poses = []
+        all_emos = []
 
         for p_file, e_file in zip(pose_files, emotion_files):
-
             pose = np.load(p_file)
             emo = np.load(e_file)
 
             pose, emo = self.clean_sequence(pose, emo)
+            all_poses.append(pose.reshape(-1, 66))
+            all_emos.append(emo)
+        
+        self.p_mean = np.mean(np.concatenate(all_poses), axis = 0)
+        self.p_std = np.std(np.concatenate(all_poses), axis = 0) + 1e-6
+        self.e_mean = np.mean(np.concatenate(all_emos), axis = 0)
+        self.e_std = np.std(np.concatenate(all_emos), axis = 0) + 1e-6
+
+        for p_file, e_file in zip(pose_files, emotion_files):
+            pose, emo = self.clean_sequence(np.load(p_file), np.load(e_file))
+            pose = (pose.reshape(-1, 66) - self.p_mean) / self.p_std
+            emo = (emo - self.e_mean) / self.e_std                        
+            
             PRED_LEN = 15
-
             for i in range(len(pose) - SEQ_LEN - PRED_LEN):
+                pose_seq = pose[i : i + SEQ_LEN]
+                emo_seq = emo[i : i + SEQ_LEN]
 
-                pose_seq = pose[i:i+SEQ_LEN]
-                emo_seq = emo[i:i+SEQ_LEN]
-
-                target = pose[i+SEQ_LEN : i + SEQ_LEN + PRED_LEN]
-                
+                target = pose[i + SEQ_LEN : i + SEQ_LEN + PRED_LEN].reshape(15, 33, 2)
 
                 x = np.concatenate(
                     [
-                        pose_seq.reshape(SEQ_LEN, -1),
+                        pose_seq,
                         emo_seq
                     ],
                     axis=1
@@ -76,6 +85,7 @@ class FusionPredictor(nn.Module):
     def __init__(self):
 
         super().__init__()
+        self.emotion_gate = nn.Parameter(torch.tensor(0.1))
 
         self.lstm = nn.LSTM(
             input_size=86,
@@ -88,6 +98,10 @@ class FusionPredictor(nn.Module):
 
 
     def forward(self, x):
+        pose_part = x[:, :, :66]
+        emo_part = x[:, :, 66:]
+
+        x = torch.cat([pose_part, self.emotion_gate * emo_part], dim = 2)
 
         _, (h, _) = self.lstm(x)
 
@@ -157,34 +171,24 @@ optimizer = torch.optim.Adam(
 loss_fn = nn.MSELoss()
 train_losses = []
 val_losses = []
-
+gate_values = []
 
 for epoch in range(20):
-
     model.train()
-
     train_loss = 0
 
-
     for x, y in train_loader:
-
         x = x.to(DEVICE)
         y = y.to(DEVICE)
 
-
         pred = model(x)
-
         loss = loss_fn(pred, y)
 
-
         optimizer.zero_grad()
-
         loss.backward()
-
         optimizer.step()
-
-
         train_loss += loss.item()
+        gate_values.append(model.emotion_gate.item())
 
 
     model.eval()
@@ -239,3 +243,9 @@ plt.ylabel("Loss")
 
 plt.savefig("loss_curve.png")
 torch.save(model.state_dict(), "fusion_model.pt")
+print("Learned emotion gate:", model.emotion_gate.item())
+plt.plot(gate_values)
+plt.title("Emotion gate evolution")
+plt.xlabel("Epoch")
+plt.ylabel("Gate value")
+plt.savefig("emotion_gate_curve.png")
