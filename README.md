@@ -2,12 +2,12 @@
 
 A lightweight multimodal predictive world model for short-horizon human motion forecasting, integrating facial-expression-derived affective embeddings with pose dynamics.
 
-👥 Authors
+👥 Authors: 
 Jingni Huang
 📧 jingni.huang@kellogg.ox.ac.uk/ jingnih@gmail.com, Peter Bloodsworth
 📧 peter.bloodsworth@cs.ox.ac.uk
 
-📚 Related Work
+📚 Related Work:
 This work is inspired by the predictive world model paradigm proposed by LeCun et al., where intelligent systems learn compact latent representations to capture the dynamics of the physical world rather than directly predicting observations.
 Predictive world models focus on learning temporally consistent latent state transitions that support reasoning, planning, and long-horizon prediction. Instead of optimizing short-term geometric accuracy, these models aim to capture the evolution of the environment through internal representations.
 Our approach adopts this perspective and applies it to short-horizon multimodal pose prediction by integrating affective signals into the latent dynamics.
@@ -17,7 +17,7 @@ Unlike large-scale world model architectures that require extensive computationa
 Recent work on JEPA-based world models further explores stable latent representation learning for long-horizon reasoning, reinforcing the importance of predictive latent dynamics over direct observation prediction.
 
 
-🚀 Overview
+🚀 Overview:
 Human motion is not purely kinematic—it is strongly influenced by latent affective and intentional states.
 This project explores:
    •   How facial-expression-derived emotion signals influence motion prediction
@@ -30,7 +30,7 @@ We propose a lightweight emotion-conditioned predictive world model that:
    •   Evaluates robustness via counterfactual perturbation
 
 
-🏗️ System Architecture
+🏗️ System Architecture:
 Pipeline:
 Video → Pose Extraction → Emotion Extraction → Fusion → Predictor → Rollout → Evaluation  → Counterfactual 
 Modules:
@@ -43,7 +43,7 @@ Modules:
    •   counterfactual.py → robustness analysis
 
 
-🧪 Key Results(Details see paper)
+🧪 Key Results(Details see paper):
 Dataset II (in-the-wild affect-driven sequences)
 Model	Normalization	Gate	Test Loss	MPJPE
 Pose Baseline	✓	-	0.0072	0.0334
@@ -59,14 +59,14 @@ Insights
 
 
 
-🔬 Counterfactual Analysis
+🔬 Counterfactual Analysis:
 Model	Gate	Counterfactual Difference
 Fusion	0.090	0.3077
 World Model	0.109	0.0332 ↓
 👉 World model is significantly more robust to perturbations
 
 
-🧠 Key Contributions
+🧠 Key Contributions:
    •  Lightweight multimodal pose forecasting (runs on low-resource setup)
    •   Emotion-conditioned latent fusion with learned gating
    •   Empirical evidence: emotion improves prediction only when properly integrated
@@ -75,7 +75,7 @@ World Model	0.109	0.0332 ↓
       •   counterfactual robustness in pose forecasting
 
 
-⚙️ Design Philosophy
+⚙️ Design Philosophy:
 Inspired by LeCun’s world model paradigm, this project focuses on:
 	Learning latent dynamics rather than direct prediction.
 However:
@@ -84,27 +84,27 @@ However:
    •   Prioritizes efficiency and interpretability
 
 
-📦 Dataset
-   •   Dataset I: Intel OpenVINO demo videos (controlled motion)
-   •   Dataset II: In-the-wild YouTube sequences (affect-driven motion)
+📦 Dataset:
+	Dataset I: Intel OpenVINO demo videos (controlled motion)
+   	Dataset II: In-the-wild YouTube sequences (affect-driven motion)
 👉 Only Dataset II shows clear benefit from emotion conditioning.
 
 
-🧪 Metrics
-   •   MPJPE (Mean Per Joint Position Error)
+🧪 Metrics:
+   MPJPE (Mean Per Joint Position Error)
 → computed in denormalized space
-   •   Training/Test Loss
+   Training/Test Loss
 → computed in normalized space (MSE)
 
 
-🛠️ Tech Stack
+🛠️ Tech Stack:
    •   PyTorch
    •   MediaPipe (Pose + Face Mesh)
    •   NumPy
    •   OpenCV
 
 
-⚙️ Environment Setup
+⚙️ Environment Setup: 
 Step 1: Install Python 3.10
 Codespaces usually do not include Python 3.10 by default.
 sudo add-apt-repository ppa:deadsnakes/ppa -y
@@ -127,7 +127,7 @@ pip install opencv-python-headless==4.8.0.74
 
 
 
-📊 Data Preparation
+📊 Data Preparation:
 Extract Pose
 python scripts/extract_pose.py
 Dataset I Shapes
@@ -143,7 +143,7 @@ SampleH: (851, 33, 2) (851, 20)
 SampleI: (710, 33, 2) (710, 20)
 
 
-📈 Future Work
+📈 Future Work:
    •   Transformer-based world model
    •   Longer horizon prediction
    •   Better emotion representation (beyond landmarks)
