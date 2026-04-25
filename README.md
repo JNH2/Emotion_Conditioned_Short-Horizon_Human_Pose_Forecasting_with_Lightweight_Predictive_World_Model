@@ -1,74 +1,121 @@
-### 第一步：安装 Python 3.10 本体
-Codespace 的默认镜像通常不带 3.10。先执行这个，否则你建不了 3.10 的虚拟环境：
-```bash
+🧠 Emotion-Conditioned Short-Horizon Human Pose Forecasting
+A lightweight multimodal predictive world model for short-horizon human motion forecasting, integrating facial-expression-derived affective embeddings with pose dynamics.
+👥 Authors
+Jingni Huang
+📧 jingni.huang@kellogg.ox.ac.uk/ jingnih@gmail.com
+Peter Bloodsworth
+📧 peter.bloodsworth@cs.ox.ac.uk
+📚 Related Work
+This work is inspired by the predictive world model paradigm proposed by LeCun et al., where intelligent systems learn compact latent representations to capture the dynamics of the physical world rather than directly predicting observations.
+Predictive world models focus on learning temporally consistent latent state transitions that support reasoning, planning, and long-horizon prediction. Instead of optimizing short-term geometric accuracy, these models aim to capture the evolution of the environment through internal representations.
+Our approach adopts this perspective and applies it to short-horizon multimodal pose prediction by integrating affective signals into the latent dynamics.
+Unlike large-scale world model architectures that require extensive computational resources and Transformer-based backbones, our method focuses on lightweight multimodal fusion and autoregressive rollout prediction. This enables efficient deployment while preserving the core idea of predictive state representation learning.
+Recent work on JEPA-based world models further explores stable latent representation learning for long-horizon reasoning, reinforcing the importance of predictive latent dynamics over direct observation prediction.
+🚀 Overview
+Human motion is not purely kinematic—it is strongly influenced by latent affective and intentional states.
+This project explores:
+   •   How facial-expression-derived emotion signals influence motion prediction
+   •   Whether multimodal fusion improves short-horizon forecasting
+   •   How lightweight world models behave under affect perturbations
+We propose a lightweight emotion-conditioned predictive world model that:
+   •   Extracts pose (33×2) and facial embeddings (20D)
+   •   Learns a gated multimodal representation
+   •   Performs short-horizon rollout prediction (15 frames)
+   •   Evaluates robustness via counterfactual perturbation
+🏗️ System Architecture
+Pipeline:
+Video → Pose Extraction → Emotion Extraction → Fusion → Predictor → Rollout → Evaluation  → Counterfactual 
+Modules:
+   •   extract_pose.py → MediaPipe Pose (33 joints)
+   •   extract_emotion.py → Face Mesh (facial landmarks subset)
+   •   train_pose_baseline.py → Pose-only LSTM baseline
+   •   train_fusion_predictor.py → Multimodal fusion model
+   •   train_world_model_rollout.py → Autoregressive world model
+   •   evaluate_model.py → MPJPE + denormalized evaluation
+   •   counterfactual.py → robustness analysis
+🧪 Key Results(Details see paper)
+Dataset II (in-the-wild affect-driven sequences)
+Model	Normalization	Gate	Test Loss	MPJPE
+Pose Baseline	✓	-	0.0072	0.0334
+Fusion (naive)	✗	-	0.0070	0.0389
+Fusion + norm + α	✓	-	0.2776	N/A
+Fusion + norm + gate	✓	0.098	0.2636	0.0232 ↓
+World Model	✓	0.115	0.4164	N/A
+Insights
+   •   Naive fusion hurts performance → modality imbalance
+   •   Gated fusion improves MPJPE significantly (↓30%)
+   •   Emotion acts as auxiliary signal, not dominant driver
+   •   World model shows stable rollout but higher loss
+🔬 Counterfactual Analysis
+Model	Gate	Counterfactual Difference
+Fusion	0.090	0.3077
+World Model	0.109	0.0332 ↓
+👉 World model is significantly more robust to perturbations
+🧠 Key Contributions
+   •  Lightweight multimodal pose forecasting (runs on low-resource setup)
+   •   Emotion-conditioned latent fusion with learned gating
+   •   Empirical evidence: emotion improves prediction only when properly integrated
+   •   First exploration (lightweight setting) of:
+      •   affect-conditioned world models
+      •   counterfactual robustness in pose forecasting
+⚙️ Design Philosophy
+Inspired by LeCun’s world model paradigm, this project focuses on:
+	Learning latent dynamics rather than direct prediction.
+However:
+   •   We use a minimal LSTM rollout model
+   •   Designed for short-horizon forecasting (0.5–3s)
+   •   Prioritizes efficiency and interpretability
+📦 Dataset
+   •   Dataset I: Intel OpenVINO demo videos (controlled motion)
+   •   Dataset II: In-the-wild YouTube sequences (affect-driven motion)
+👉 Only Dataset II shows clear benefit from emotion conditioning.
+🧪 Metrics
+   •   MPJPE (Mean Per Joint Position Error)
+→ computed in denormalized space
+   •   Training/Test Loss
+→ computed in normalized space (MSE)
+🛠️ Tech Stack
+   •   PyTorch
+   •   MediaPipe (Pose + Face Mesh)
+   •   NumPy
+   •   OpenCV
+📈 Future Work
+   •   Transformer-based world model
+   •   Longer horizon prediction
+   •   Better emotion representation (beyond landmarks)
+   •   Cross-subject generalization
+⚙️ Environment Setup
+Step 1: Install Python 3.10
+Codespaces usually do not include Python 3.10 by default.
 sudo add-apt-repository ppa:deadsnakes/ppa -y
 sudo apt-get update
 sudo apt-get install -y python3.10 python3.10-venv python3.10-dev
-
-```
-### 第二步：重建虚拟环境并激活
-这里我们要强行指定 3.10 来创建，确保不被系统默认的 3.12 干扰：
-```bash
-# 如果有旧的 venv 文件夹先删掉
+Step 2: Rebuild Virtual Environment
 rm -rf venv
-
-# 创建并激活
 python3.10 -m venv venv
 source venv/bin/activate
-
-```
-*激活后，请确认终端左侧出现了 (venv)。*
-### 第三步：一键安装 Mediapipe 及其配套依赖
-我们直接用你最稳的那套版本组合：
-```bash
-# 1. 基础工具升级
+Step 3: Install Dependencies
 pip install --upgrade pip
-
-# 2. 安装所有库（注意使用 headless 版避免 libGL 报错）
 pip install numpy==1.23.5 tqdm mediapipe==0.10.11 protobuf==3.20.3 opencv-python-headless==4.8.0.74
-
-```
-### 第四步：补充系统依赖 (补丁)
-即便是新账号的 Codespace，底层 Linux 依然可能缺库：
-```bash
+Step 4: System Dependencies
 sudo apt-get update && sudo apt-get install -y libgl1-mesa-glx libglib2.0-0
-
-```
-### 第五步：验证环境
-运行这行，如果看到 **Python: 3.10** 且没有报错，就说明你“复活”成功了：
-```bash
+Step 5: Verify Environment
 python -c "import cv2, mediapipe as mp; print('Python:', __import__('sys').version.split()[0]); print('OpenCV & MediaPipe OK')"
-
-如有报错，运行下面之后再次验证
-# 1. 彻底卸载当前的 OpenCV 
+If error:
 pip uninstall -y opencv-python opencv-contrib-python opencv-python-headless
-
-# 2. 安装无头版 (它不需要 libGL)
 pip install opencv-python-headless==4.8.0.74
+📊 Data Preparation
+Extract Pose
+python scripts/extract_pose.py
+Dataset I Shapes
+sampleA: (1091, 33, 2) (1091, 20)
+sampleB: (1615, 33, 2) (1615, 20)
+sampleC: (1604, 33, 2) (1604, 20)
+sampleD: (3921, 33, 2) (3921, 20)
+Dataset II shape:
+SampleE: (567, 33, 2) (567, 20)
+SampleF: (95, 33, 2) (95, 20)
+SampleG: (345, 33, 2) (345, 20)
+SampleH: (851, 33, 2) (851, 20)
+SampleI: (710, 33, 2) (710, 20)
 
-运行：python scripts/extract_pose.python
-
-shape：
-sample1: (1091, 33, 2) (1091, 20)
-sample2: (1615, 33, 2) (1615, 20)
-sample3: (1604, 33, 2) (1604, 20)
-sample4: (3921, 33, 2) (3921, 20)
-
-
-# 1. 基础步行场景（用来建立坐标波动的 Baseline）
-curl -L -o sample1.mp4 https://github.com/intel-iot-devkit/sample-videos/raw/master/face-demographics-walking-and-pause.mp4
-
-# 下载几个公开的姿态/表情测试视频 (这些是轻量级的)
-curl -L -o sample2.mp4 https://github.com/intel-iot-devkit/sample-videos/raw/master/face-demographics-walking-and-pause.mp4
-curl -L -o sample3.mp4 https://github.com/intel-iot-devkit/sample-videos/raw/master/head-pose-face-detection-female.mp4
-
-# 4. 交互类
-curl -L -o sample4.mp4 https://github.com/intel-iot-devkit/sample-videos/raw/master/head-pose-face-detection-female.mp4
-
-
-Videos Shape:
-youtube1: (567, 33, 2) (567, 20)
-youtube2: (95, 33, 2) (95, 20)
-youtube3: (345, 33, 2) (345, 20)
-youtube4: (851, 33, 2) (851, 20)
-youtube5: (710, 33, 2) (710, 20)
