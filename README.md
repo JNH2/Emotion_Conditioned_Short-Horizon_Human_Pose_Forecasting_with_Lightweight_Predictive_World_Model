@@ -7,6 +7,15 @@ Jingni Huang
 📧 jingni.huang@kellogg.ox.ac.uk/ jingnih@gmail.com, Peter Bloodsworth
 📧 peter.bloodsworth@cs.ox.ac.uk
 
+Citation: 
+@misc{huang2025emotionpose,
+  title={Emotion-Conditioned Short-Horizon Human Pose Forecasting with a Lightweight Predictive World Model},
+  author={Jingni Huang and Peter Bloodsworth},
+  year={2025},
+  note={GitHub repository},
+  howpublished={\url{https://github.com/your-username/your-repo}}
+}
+
 📚 Related Work:
 This work is inspired by the predictive world model paradigm proposed by LeCun et al., where intelligent systems learn compact latent representations to capture the dynamics of the physical world rather than directly predicting observations.
 Predictive world models focus on learning temporally consistent latent state transitions that support reasoning, planning, and long-horizon prediction. Instead of optimizing short-term geometric accuracy, these models aim to capture the evolution of the environment through internal representations.
