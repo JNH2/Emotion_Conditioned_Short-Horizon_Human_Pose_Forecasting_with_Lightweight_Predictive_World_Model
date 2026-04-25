@@ -3,9 +3,15 @@
 A lightweight multimodal predictive world model for short-horizon human motion forecasting, integrating facial-expression-derived affective embeddings with pose dynamics.
 
 👥 Authors: 
-Jingni Huang
 📧 jingni.huang@kellogg.ox.ac.uk/ jingnih@gmail.com, Peter Bloodsworth
 📧 peter.bloodsworth@cs.ox.ac.uk
+
+Jingni Huang
+MSc in Software Engineering in Oxford University
+   •   GitHub: https://github.com/your-username
+   •   Email: jingni.huang@kellogg.ox.ac.uk / jingnih@gmail.com
+   •   LinkedIn: https://www.linkedin.com/in/jingnih
+
 
 Citation: 
 @misc{huang2025emotionpose,
