@@ -23,7 +23,7 @@ Citation:
 }
 
 📚 Related Work:
-This work is inspired by the predictive world model paradigm proposed by LeCun et al., where intelligent systems learn compact latent representations to capture the dynamics of the physical world rather than directly predicting observations.
+This work is inspired by the predictive world model paradigm proposed by LeCun Yang et al., where intelligent systems learn compact latent representations to capture the dynamics of the physical world rather than directly predicting observations.
 Predictive world models focus on learning temporally consistent latent state transitions that support reasoning, planning, and long-horizon prediction. Instead of optimizing short-term geometric accuracy, these models aim to capture the evolution of the environment through internal representations.
 Our approach adopts this perspective and applies it to short-horizon multimodal pose prediction by integrating affective signals into the latent dynamics.
 
@@ -163,10 +163,5 @@ SampleI: (710, 33, 2) (710, 20)
    •   Longer horizon prediction
    •   Better emotion representation (beyond landmarks)
    •   Cross-subject generalization
-
-
-
-
-
 
 
